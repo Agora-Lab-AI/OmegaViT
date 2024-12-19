@@ -3,15 +3,15 @@ requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
-name = "paper"
+name = "omegavit"
 version = "0.0.1"
-description = "Paper - Pytorch"
+description = "OmegaViT: A State-of-the-Art Vision Transformer with Multi-Query Attention, State Space Modeling, and Mixture of Experts"
 license = "MIT"
 authors = ["Kye Gomez <kye@apac.ai>"]
-homepage = "https://github.com/kyegomez/paper"
-documentation = "https://github.com/kyegomez/paper"  # Add this if you have documentation.
+homepage = "https://github.com/Agora-Lab-AI/OmegaViT"
+documentation = "https://github.com/Agora-Lab-AI/OmegaViT"  # Add this if you have documentation.
 readme = "README.md"  # Assuming you have a README.md
-repository = "https://github.com/kyegomez/paper"
+repository = "https://github.com/Agora-Lab-AI/OmegaViT"
 keywords = ["artificial intelligence", "deep learning", "optimizers", "Prompt Engineering"]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -23,11 +23,9 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = "^3.10"
-swarms = "*"
-zetascale = "*"
-
-[tool.poetry.dev-dependencies]
-# Add development dependencies here
+torch = "*"
+loguru = "*"
+einops = "*"
 
 
 [tool.poetry.group.lint.dependencies]

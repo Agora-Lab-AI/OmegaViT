@@ -1,5 +1,8 @@
+import sys
+from omegavit.main import create_advanced_vit, train_step
+import torch
+from loguru import logger
 
-# Example training loop
 def main():
     """Main training function."""
     logger.info("Starting training setup")
