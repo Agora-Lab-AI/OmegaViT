@@ -1,67 +1,161 @@
-[![Multi-Modality](agorabanner.png)](https://discord.com/servers/agora-999382051935506503)
-
-# Python Package Template
+# OmegaViT: A State-of-the-Art Vision Transformer with Multi-Query Attention, State Space Modeling, and Mixture of Experts
 
 [![Join our Discord](https://img.shields.io/badge/Discord-Join%20our%20server-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/agora-999382051935506503) [![Subscribe on YouTube](https://img.shields.io/badge/YouTube-Subscribe-red?style=for-the-badge&logo=youtube&logoColor=white)](https://www.youtube.com/@kyegomez3242) [![Connect on LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/kye-g-38759a207/) [![Follow on X.com](https://img.shields.io/badge/X.com-Follow-1DA1F2?style=for-the-badge&logo=x&logoColor=white)](https://x.com/kyegomezb)
 
-A easy, reliable, fluid template for python packages complete with docs, testing suites, readme's, github workflows, linting and much much more
 
+
+
+[![PyPI version](https://badge.fury.io/py/omegavit.svg)](https://badge.fury.io/py/omegavit)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Build Status](https://github.com/Agora-Lab-AI/OmegaViT/workflows/build/badge.svg)](https://github.com/Agora-Lab-AI/OmegaViT/actions)
+[![Documentation Status](https://readthedocs.org/projects/omegavit/badge/?version=latest)](https://omegavit.readthedocs.io/en/latest/?badge=latest)
+
+OmegaViT (ΩViT) is a cutting-edge vision transformer architecture that combines multi-query attention, rotary embeddings, state space modeling, and mixture of experts to achieve superior performance across various computer vision tasks. The model can process images of any resolution while maintaining computational efficiency.
+
+## Key Features
+
+- **Flexible Resolution Processing**: Handles arbitrary input image sizes through adaptive patch embedding
+- **Multi-Query Attention (MQA)**: Reduces computational complexity while maintaining model expressiveness
+- **Rotary Embeddings**: Enables better modeling of relative positions and spatial relationships
+- **State Space Models (SSM)**: Integrates efficient sequence modeling every third layer
+- **Mixture of Experts (MoE)**: Implements conditional computation for enhanced model capacity
+- **Comprehensive Logging**: Built-in loguru integration for detailed execution tracking
+- **Shape-Aware Design**: Continuous tensor shape tracking for reliable processing
+
+## Architecture
+
+```mermaid
+flowchart TB
+    subgraph Input
+        img[Input Image]
+    end
+    
+    subgraph PatchEmbed[Flexible Patch Embedding]
+        conv[Convolution]
+        norm1[LayerNorm]
+        conv --> norm1
+    end
+    
+    subgraph TransformerBlocks[Transformer Blocks x12]
+        subgraph Block1[Block n]
+            direction TB
+            mqa[Multi-Query Attention]
+            ln1[LayerNorm]
+            moe1[Mixture of Experts]
+            ln2[LayerNorm]
+            ln1 --> mqa --> ln2 --> moe1
+        end
+        
+        subgraph Block2[Block n+1]
+            direction TB
+            mqa2[Multi-Query Attention]
+            ln3[LayerNorm]
+            moe2[Mixture of Experts]
+            ln4[LayerNorm]
+            ln3 --> mqa2 --> ln4 --> moe2
+        end
+        
+        subgraph Block3[Block n+2 SSM]
+            direction TB
+            ssm[State Space Model]
+            ln5[LayerNorm]
+            moe3[Mixture of Experts]
+            ln6[LayerNorm]
+            ln5 --> ssm --> ln6 --> moe3
+        end
+    end
+    
+    subgraph Output
+        gap[Global Average Pooling]
+        classifier[Classification Head]
+    end
+    
+    img --> PatchEmbed --> TransformerBlocks --> gap --> classifier
+```
+
+## Multi-Query Attention Detail
+
+```mermaid
+flowchart LR
+    input[Input Features]
+    
+    subgraph MQA[Multi-Query Attention]
+        direction TB
+        q[Q Linear]
+        k[K Linear]
+        v[V Linear]
+        rotary[Rotary Embeddings]
+        attn[Attention Weights]
+        
+        input --> q & k & v
+        q & k --> rotary
+        rotary --> attn
+        attn --> v
+    end
+    
+    MQA --> output[Output Features]
+
+```
 
 ## Installation
 
-You can install the package using pip
-
 ```bash
-pip install -e .
+pip install omegavit
 ```
 
-# Usage
+## Quick Start
+
 ```python
-print("hello world")
+import torch
+from omegavit import create_advanced_vit
 
+# Create model
+model = create_advanced_vit(num_classes=1000)
+
+# Example forward pass
+batch_size = 8
+x = torch.randn(batch_size, 3, 224, 224)
+output = model(x)
+print(f"Output shape: {output.shape}")  # [8, 1000]
 ```
 
+## Model Configurations
 
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| hidden_size | 768 | Dimension of transformer layers |
+| num_attention_heads | 12 | Number of attention heads |
+| num_experts | 8 | Number of expert networks in MoE |
+| expert_capacity | 32 | Tokens per expert in MoE |
+| num_layers | 12 | Number of transformer blocks |
+| patch_size | 16 | Size of image patches |
+| ssm_state_size | 16 | Hidden state size in SSM |
 
-### Code Quality 🧹
+## Performance
 
-- `make style` to format the code
-- `make check_code_quality` to check code quality (PEP8 basically)
-- `black .`
-- `ruff . --fix`
+*Note: Benchmarks coming soon*
 
-### Tests 🧪
+## Citation
 
-[`pytests`](https://docs.pytest.org/en/7.1.x/) is used to run our tests.
+If you use OmegaViT in your research, please cite:
 
-### Publish on PyPi 🚀
-
-**Important**: Before publishing, edit `__version__` in [src/__init__](/src/__init__.py) to match the wanted new version.
-
+```bibtex
+@article{omegavit2024,
+  title={OmegaViT: A State-of-the-Art Vision Transformer with Multi-Query Attention, State Space Modeling, and Mixture of Experts},
+  author={Agora Lab},
+  journal={arXiv preprint arXiv:XXXX.XXXXX},
+  year={2024}
+}
 ```
-poetry build
-poetry publish
-```
 
-### CI/CD 🤖
+## Contributing
 
-We use [GitHub actions](https://github.com/features/actions) to automatically run tests and check code quality when a new PR is done on `main`.
+We welcome contributions! Please see our [contributing guidelines](CONTRIBUTING.md) for details.
 
-On any pull request, we will check the code quality and tests.
+## License
 
-When a new release is created, we will try to push the new code to PyPi. We use [`twine`](https://twine.readthedocs.io/en/stable/) to make our life easier. 
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-The **correct steps** to create a new realease are the following:
-- edit `__version__` in [src/__init__](/src/__init__.py) to match the wanted new version.
-- create a new [`tag`](https://git-scm.com/docs/git-tag) with the release name, e.g. `git tag v0.0.1 && git push origin v0.0.1` or from the GitHub UI.
-- create a new release from GitHub UI
+## Acknowledgments
 
-The CI will run when you create the new release.
-
-# Docs
-We use MK docs. This repo comes with the zeta docs. All the docs configurations are already here along with the readthedocs configs.
-
-
-
-# License
-MIT
+Special thanks to the Agora Lab AI team and the open-source community for their valuable contributions and feedback.
